@@ -135,7 +135,7 @@ void SonyDevice::_setupSession() {
     if (_version == SonyProtocolVersion::V1) {
         _protocol = std::make_unique<protocol::ProtocolV1>(*_session);
     } else {
-        _protocol = std::make_unique<protocol::ProtocolV2>(*_session);
+        _protocol = std::make_unique<protocol::ProtocolV2>(*_session, _profile.model);
     }
 
     _session->onNotification([this](const protocol::SonyFrame& frame) {
