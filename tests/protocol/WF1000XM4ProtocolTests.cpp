@@ -9,6 +9,8 @@ using namespace sony::protocol;
 using namespace sony::transport;
 using sony::test::ReplyingFakeTransport;
 
+// WF-1000XM4 uses the older NCASM 0x15 layout documented by the
+// model-specific sony-headphones-ctl implementation, including the wind byte.
 TEST_CASE("WF-1000XM4: noise control uses 0x6815 layout", "[protocol][v2][wf1000xm4]")
 {
     ReplyingFakeTransport fake;
