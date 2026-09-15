@@ -25,8 +25,8 @@ int apoIndexFromCode(uint8_t c0, uint8_t c1) {
 
 } // namespace
 
-ProtocolV2::ProtocolV2(SonyProtocolSession& session)
-    : _session(session) {}
+ProtocolV2::ProtocolV2(SonyProtocolSession& session, SonyModel model)
+    : _session(session), _model(model) {}
 
 void ProtocolV2::initDevice() {
     // V2 handshake init: 0x00 0x00 -> RET 0x01
@@ -127,6 +127,24 @@ void ProtocolV2::setNoiseControl(const NoiseControlState& state) {
     uint8_t settingType = (state.mode == NoiseControlMode::Ambient) ? 1 : 0;
     uint8_t voice = state.focusOnVoice ? 1 : 0;
     uint8_t level = static_cast<uint8_t>(state.ambientLevel > 0 ? state.ambientLevel : 1);
+
+    if (_model == SonyModel::WF1000XM4) {
+        // WF-1000XM4 uses NCASM_SET 0x6815 with an additional wind-control
+        // byte before voice/level. 0x02 means wind reduction disabled.
+        // Layout: 68 15 01 <effect> <mode> 02 <voice> <level>
+        std::vector<uint8_t> payload = {
+            0x68,
+            0x15,
+            0x01,
+            effect,
+            settingType,
+            0x02,
+            voice,
+            level
+        };
+        _session.send(SonyFrame{ .type = DataType::DataMdr, .payload = std::move(payload) });
+        return;
+    }
 
     std::vector<uint8_t> payload = {
         0x68,
