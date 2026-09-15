@@ -1,5 +1,6 @@
 #pragma once
 
+#include "DeviceProfile.h"
 #include "IProtocol.h"
 #include "SonyProtocolSession.h"
 #include <mutex>
@@ -8,7 +9,7 @@ namespace sony::protocol {
 
 class ProtocolV2 : public IProtocol {
 public:
-    explicit ProtocolV2(SonyProtocolSession& session);
+    explicit ProtocolV2(SonyProtocolSession& session, SonyModel model = SonyModel::Unknown);
     ~ProtocolV2() override = default;
 
     [[nodiscard]] ProtocolGeneration generation() const noexcept override {
@@ -44,6 +45,7 @@ public:
 
 private:
     SonyProtocolSession& _session;
+    SonyModel _model{SonyModel::Unknown};
     std::mutex _mutex;
 };
 
